@@ -55,5 +55,16 @@ docker build -t stylesync .
 docker run -p 3000:3000 -p 8000:8000 stylesync
 ```
 
+## 🌐 Deployment to Render
+
+To deploy StyleSync to Render as a single Web Service:
+
+1. **Create a New Web Service**: Link your GitHub repository.
+2. **Select Runtime**: Choose **Docker**.
+3. **Configure Environment Variables**:
+   - `DATABASE_URL`: Set this to your Neon connection string. (Format: `postgresql+asyncpg://user:pass@host/db?sslmode=require`)
+   - `PORT`: Set this to `80` (This is the port Nginx listens on).
+4. **Deploy**: Render will build the container using the root-level `Dockerfile` and serve both the frontend and API through a single URL.
+
 ---
 **Crafted for the Vibe Coder Assessment.**

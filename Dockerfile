@@ -1,10 +1,11 @@
 # Start with Python base for the backend
 FROM python:3.11-slim as backend
 
-# Install Node.js for the frontend build
+# Install Node.js and Nginx
 RUN apt-get update && apt-get install -y \
     curl \
     gnupg \
+    nginx \
     && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
@@ -15,6 +16,9 @@ WORKDIR /app
 COPY backend/requirements.txt ./backend/
 RUN pip install --no-cache-dir -r backend/requirements.txt
 RUN playwright install --with-deps chromium
+
+# 2. Copy Nginx config
+COPY nginx.conf /etc/nginx/nginx.conf
 
 # 2. Install Frontend Dependencies and Build
 COPY frontend/package*.json ./frontend/

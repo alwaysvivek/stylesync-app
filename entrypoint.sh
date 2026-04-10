@@ -8,6 +8,10 @@ cd /app/backend && uvicorn app.main:app --host 0.0.0.0 --port 8000 &
 echo "Starting frontend..."
 cd /app/frontend && npm start -- -p 3000
 
+# Start Nginx
+echo "Starting Nginx..."
+service nginx start
+
 # Wait for any process to exit
 wait -n
 
