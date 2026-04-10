@@ -80,13 +80,14 @@ html, body {
 }
 
 .btn-primary {
-  background-color: var(--color-primary);
+  background-color: var(--color-primary, #18181B);
   color: #fff;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
-  filter: brightness(1.05);
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  filter: brightness(1.15);
 }
 
 .btn-secondary {

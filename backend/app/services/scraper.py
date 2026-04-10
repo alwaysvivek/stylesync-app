@@ -5,7 +5,10 @@ class Scraper:
     async def scrape(self, url: str) -> Dict:
         async with async_playwright() as p:
             browser = await p.chromium.launch(headless=True)
-            page = await browser.new_api_context().new_page()
+            context = await browser.new_context(
+                user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+            )
+            page = await context.new_page()
             
             try:
                 await page.goto(url, wait_until="networkidle", timeout=30000)

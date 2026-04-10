@@ -26,24 +26,26 @@ class Extractor:
         }
 
     def _process_colors(self, styles: Dict, palette: List[str]) -> Dict:
-        # Prioritize button/heading colors as they are likely brand colors
         candidates = []
         if 'button' in styles:
             candidates.append(styles['button'].get('backgroundColor'))
             candidates.append(styles['button'].get('color'))
         if 'h1' in styles:
             candidates.append(styles['h1'].get('color'))
+        if 'link' in styles:
+            candidates.append(styles['link'].get('color'))
             
-        # Add palette colors
         candidates.extend(palette)
         
-        # Filter for vibrant/unique colors
+        # Filter for valid, non-transparent, brand-like colors
+        valid_colors = [c for c in candidates if self._is_valid_color(c)]
+        
+        # Deduplicate while preserving order
         unique_colors = []
-        for c in candidates:
-            if c and c not in unique_colors:
+        for c in valid_colors:
+            if c not in unique_colors:
                 unique_colors.append(c)
-                
-        # Simple assignment logic
+        
         return {
             "primary": unique_colors[0] if len(unique_colors) > 0 else "#6366f1",
             "secondary": unique_colors[1] if len(unique_colors) > 1 else "#1e293b",
@@ -52,25 +54,37 @@ class Extractor:
             "text": styles.get('body', {}).get('color', "#09090b")
         }
 
+    def _is_valid_color(self, color: Any) -> bool:
+        if not color or not isinstance(color, str): return False
+        c = color.lower().strip()
+        if c in ['transparent', 'rgba(0, 0, 0, 0)', 'rgba(0,0,0,0)', 'none']: return False
+        # Basic check to avoid ultra-light grayscale for primary
+        if c in ['#fff', '#ffffff', 'rgb(255, 255, 255)', 'rgba(255, 255, 255, 1)']: return False
+        return True
+
     def _process_typography(self, styles: Dict) -> Dict:
         body = styles.get('body', {})
         h1 = styles.get('h1', {})
         
+        def safe_font(font):
+            if not font or font == 'none': return "Inter, sans-serif"
+            return font
+
         return {
             "fontFamilies": {
-                "heading": h1.get('fontFamily', "Inter, sans-serif"),
-                "body": body.get('fontFamily', "Inter, sans-serif")
+                "heading": safe_font(h1.get('fontFamily')),
+                "body": safe_font(body.get('fontFamily'))
             },
             "sizes": {
-                "h1": h1.get('fontSize', "2.5rem"),
-                "p": body.get('fontSize', "1rem")
+                "h1": h1.get('fontSize') if h1.get('fontSize') and 'px' in str(h1.get('fontSize')) or 'rem' in str(h1.get('fontSize')) else "2.5rem",
+                "p": body.get('fontSize') if body.get('fontSize') and ('px' in str(body.get('fontSize')) or 'rem' in str(body.get('fontSize'))) else "1rem"
             },
             "weights": {
                 "bold": h1.get('fontWeight', "700"),
                 "normal": body.get('fontWeight', "400")
             },
             "lineHeights": {
-                "tight": h1.get('lineHeight', "1.2"),
-                "relaxed": body.get('lineHeight', "1.6")
+                "tight": h1.get('lineHeight') if h1.get('lineHeight') and h1.get('lineHeight') != 'normal' else "1.2",
+                "relaxed": body.get('lineHeight') if body.get('lineHeight') and body.get('lineHeight') != 'normal' else "1.6"
             }
         }

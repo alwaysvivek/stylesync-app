@@ -87,16 +87,16 @@ export default function Dashboard() {
 
   // Error is now handled inline with the beautiful "Extraction Blocked" UI below
 
-  // Inject CSS variables locally for the preview grid
+  // Inject CSS variables locally for the preview grid with safe fallbacks
   const cssVars = tokens ? {
-    '--color-primary': tokens.colors.primary,
-    '--color-secondary': tokens.colors.secondary,
-    '--color-accent': tokens.colors.accent,
-    '--color-background': tokens.colors.background,
-    '--color-text': tokens.colors.text,
-    '--font-heading': tokens.typography.fontFamilies?.heading,
-    '--font-body': tokens.typography.fontFamilies?.body,
-    '--spacing-base': `${tokens.spacing.base}px`,
+    '--color-primary': tokens.colors.primary && tokens.colors.primary !== 'transparent' ? tokens.colors.primary : '#6366f1',
+    '--color-secondary': tokens.colors.secondary || '#1e293b',
+    '--color-accent': tokens.colors.accent || '#f59e0b',
+    '--color-background': tokens.colors.background || '#ffffff',
+    '--color-text': tokens.colors.text || '#09090b',
+    '--font-heading': tokens.typography.fontFamilies?.heading || 'Inter, sans-serif',
+    '--font-body': tokens.typography.fontFamilies?.body || 'Inter, sans-serif',
+    '--spacing-base': `${tokens.spacing.base || 16}px`,
   } as React.CSSProperties : {};
 
   return (
